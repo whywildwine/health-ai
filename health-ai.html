@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Health AI – Personal Coach</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --accent: #39d353;
+    --accent2: #58a6ff;
+    --accent3: #f78166;
+    --accent4: #ffa657;
+    --text: #e6edf3;
+    --text-muted: #7d8590;
+    --text-dim: #484f58;
+    --radius: 12px;
+    --glow: 0 0 20px rgba(57,211,83,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(57,211,83,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(57,211,83,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #39d353, #1a7f37);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+    box-shadow: var(--glow);
+  }
+
+  .header-text h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  .header-text p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .status-dot {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .status-dot::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  /* Profile strip */
+  .profile-strip {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .profile-tag {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .profile-tag span { color: var(--text); font-weight: 500; }
+
+  /* Input section */
+  .input-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .input-section:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(57,211,83,0.1);
+  }
+
+  .input-header {
+    padding: 14px 16px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .input-header-icon { font-size: 16px; }
+
+  .input-header-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .log-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .log-field {
+    background: var(--surface);
+    padding: 12px 14px;
+  }
+
+  .log-field:nth-child(5) { grid-column: 1 / -1; }
+
+  .log-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .log-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: none;
+    min-height: 36px;
+  }
+
+  .log-input::placeholder { color: var(--text-dim); }
+
+  .log-input.exercise { min-height: 40px; }
+
+  /* Analyze button */
+  .analyze-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #39d353, #2ea043);
+    border: none;
+    border-radius: var(--radius);
+    color: #0d1117;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .analyze-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(57,211,83,0.35);
+  }
+
+  .analyze-btn:active:not(:disabled) { transform: translateY(0); }
+
+  .analyze-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--surface2);
+    color: var(--text-muted);
+  }
+
+  /* Loading */
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-muted);
+  }
+
+  .loading.active { display: block; }
+
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-size: 14px;
+    animation: fade 1.5s ease-in-out infinite;
+  }
+
+  @keyframes fade { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+  /* Result section */
+  .result {
+    display: none;
+    animation: slideUp 0.4s ease;
+  }
+
+  .result.active { display: block; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .result-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .result-date {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Summary cards */
+  .summary-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+  }
+
+  .summary-card.calories::before { background: var(--accent4); }
+  .summary-card.sodium::before { background: var(--accent2); }
+  .summary-card.score::before { background: var(--accent); }
+
+  .summary-card-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .summary-card-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .calories .summary-card-value { color: var(--accent4); }
+  .sodium .summary-card-value { color: var(--accent2); }
+  .score .summary-card-value { color: var(--accent); font-size: 28px; }
+
+  .summary-card-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* Evaluation row */
+  .eval-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .eval-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .eval-icon { font-size: 18px; }
+
+  .eval-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .eval-status {
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  .status-good { color: var(--accent); }
+  .status-warn { color: var(--accent4); }
+  .status-bad { color: var(--accent3); }
+
+  /* Content blocks */
+  .content-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 12px;
+  }
+
+  .content-block-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .content-block-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .content-block-body ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .content-block-body li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--surface2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 13.5px;
+  }
+
+  .content-block-body li::before {
+    content: '→';
+    color: var(--accent);
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .risk-item::before { content: '⚠' !important; color: var(--accent3) !important; }
+
+  /* Markdown-like content rendering */
+  .prose p { margin-bottom: 8px; }
+  .prose p:last-child { margin-bottom: 0; }
+
+  /* History section */
+  .history-section {
+    margin-top: 40px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+
+  .history-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .history-empty {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-dim);
+    font-size: 13px;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+  }
+
+  .history-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .history-item:hover { border-color: var(--accent2); }
+
+  .history-score {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent);
+    width: 44px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .history-date { font-size: 12px; color: var(--text-muted); }
+  .history-cal { font-size: 13px; color: var(--text); margin-top: 2px; }
+  .history-chevron { margin-left: auto; color: var(--text-dim); font-size: 14px; }
+
+  /* Error */
+  .error-box {
+    display: none;
+    background: rgba(247,129,102,0.1);
+    border: 1px solid rgba(247,129,102,0.3);
+    border-radius: var(--radius);
+    padding: 16px;
+    color: var(--accent3);
+    font-size: 13px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .error-box.active { display: block; }
+
+  @media (max-width: 520px) {
+    .summary-row, .eval-row { grid-template-columns: 1fr; }
+    .log-grid { grid-template-columns: 1fr; }
+    .log-field:nth-child(5) { grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">🫀</div>
+    <div class="header-text">
+      <h1>Personal Health AI</h1>
+      <p>Daily Log Analyzer · Hypertension Focus</p>
+    </div>
+    <div class="status-dot">AI Ready</div>
+  </div>
+
+  <!-- Profile strip -->
+  <div class="profile-strip">
+    <div class="profile-tag">👤 <span>พี่ปุ๊ก</span> · Age 62-63</div>
+    <div class="profile-tag">⚖️ <span>65 kg</span> · 165 cm</div>
+    <div class="profile-tag">💊 <span>Amlodipine</span> + Enalapril</div>
+    <div class="profile-tag">🎯 BP Control · Muscle Maintain</div>
+  </div>
+
+  <!-- Input Section -->
+  <div class="input-section">
+    <div class="input-header">
+      <span class="input-header-icon">📋</span>
+      <span class="input-header-label">Daily Food & Activity Log</span>
+    </div>
+    <div class="log-grid">
+      <div class="log-field">
+        <div class="log-label">🌅 Breakfast</div>
+        <textarea class="log-input" id="breakfast" placeholder="e.g. ข้าวต้มหมู, ไข่ดาว, น้ำเปล่า..." rows="2"></textarea>
+      </div>
+      <div class="log-field">
+        <div class="log-label">☀️ Lunch</div>
+        <textarea class="log-input" id="lunch" placeholder="e.g. ข้าวผัดกุ้ง, ต้มยำ..." rows="2"></textarea>
+      </div>
+      <div class="log-field">
+        <div class="log-label">🌙 Dinner</div>
+        <textarea class="log-input" id="dinner" placeholder="e.g. ผัดผักรวม, ปลานึ่ง..." rows="2"></textarea>
+      </div>
+      <div class="log-field">
+        <div class="log-label">🍎 Snack</div>
+        <textarea class="log-input" id="snack" placeholder="e.g. กล้วย, โยเกิร์ต..." rows="2"></textarea>
+      </div>
+      <div class="log-field">
+        <div class="log-label">🏃 Exercise</div>
+        <textarea class="log-input exercise" id="exercise" placeholder="e.g. เดิน 30 นาที, ยกน้ำหนักเบา..." rows="2"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <button class="analyze-btn" id="analyzeBtn" onclick="analyzeLog()">
+    <span>🧠</span> Analyze My Day
+  </button>
+
+  <div class="error-box" id="errorBox"></div>
+  
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">AI is analyzing your health data...</div>
+  </div>
+
+  <!-- Result -->
+  <div class="result" id="result">
+    <div class="result-header">
+      <div class="result-title">📊 Daily Health Report</div>
+      <div class="result-date" id="resultDate"></div>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="summary-row">
+      <div class="summary-card calories">
+        <div class="summary-card-label">Calories</div>
+        <div class="summary-card-value" id="calValue">—</div>
+        <div class="summary-card-sub">kcal</div>
+      </div>
+      <div class="summary-card sodium">
+        <div class="summary-card-label">Sodium</div>
+        <div class="summary-card-value" id="sodiumValue">—</div>
+        <div class="summary-card-sub">mg</div>
+      </div>
+      <div class="summary-card score">
+        <div class="summary-card-label">Score</div>
+        <div class="summary-card-value" id="scoreValue">—</div>
+        <div class="summary-card-sub">/10</div>
+      </div>
+    </div>
+
+    <!-- Evaluation -->
+    <div class="eval-row">
+      <div class="eval-card">
+        <div class="eval-icon">🔥</div>
+        <div>
+          <div class="eval-label">Calories</div>
+          <div class="eval-status" id="evalCal">—</div>
+        </div>
+      </div>
+      <div class="eval-card">
+        <div class="eval-icon">🧂</div>
+        <div>
+          <div class="eval-label">Sodium</div>
+          <div class="eval-status" id="evalSodium">—</div>
+        </div>
+      </div>
+      <div class="eval-card">
+        <div class="eval-icon">💪</div>
+        <div>
+          <div class="eval-label">Protein</div>
+          <div class="eval-status" id="evalProtein">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Risks -->
+    <div class="content-block" id="risksBlock" style="display:none">
+      <div class="content-block-title">⚠️ Key Risks</div>
+      <div class="content-block-body">
+        <ul id="risksList"></ul>
+      </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="content-block">
+      <div class="content-block-title">✅ Recommendations</div>
+      <div class="content-block-body">
+        <ul id="recList"></ul>
+      </div>
+    </div>
+
+    <!-- Extra notes -->
+    <div class="content-block" id="notesBlock" style="display:none">
+      <div class="content-block-title">📝 Coach Notes</div>
+      <div class="content-block-body prose" id="notesText"></div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="history-section">
+    <div class="history-title">📅 Recent Logs</div>
+    <div id="historyContainer">
+      <div class="history-empty">No logs yet. Start by analyzing your first day! 🌱</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SYSTEM_PROMPT = `You are a personal health coach for พี่ปุ๊ก (Komkrit), a 62-63 year old male.
+
+PROFILE:
+- Weight: 65 kg, Height: 165 cm, BMI ~23.9
+- Activity: Light to moderate
+- Medications: Amlodipine 10mg, Enalapril 5mg, Simvastatin 20mg (bedtime), Fish Oil, Multivitamin, Cetirizine (as needed)
+- Condition: Hypertension
+- Goals: BP control, muscle maintenance, avoid weight gain, functional fitness
+
+ANALYSIS RULES:
+- Calorie target: 1200–1800 kcal/day
+- Sodium limit: <2000 mg/day (strict for hypertension + medications)
+- Protein target: 65–80g/day (1.0–1.2g/kg for muscle maintenance in older adult)
+- Watch for: late eating after 20:00, high-sodium Thai foods, sedentary days
+
+You MUST respond with ONLY valid JSON (no markdown, no backticks, no extra text):
+
+{
+  "calories": "1300–1550",
+  "sodium": "1200–1600",
+  "score": 8,
+  "eval": {
+    "calories": "Optimal",
+    "sodium": "Safe",
+    "protein": "Adequate"
+  },
+  "risks": ["Risk item 1", "Risk item 2"],
+  "recommendations": ["Action 1", "Action 2", "Action 3"],
+  "notes": "Optional friendly coach note in Thai or English, max 2 sentences."
+}
+
+EVAL values: calories = "Low" | "Optimal" | "High", sodium = "Safe" | "Borderline" | "High", protein = "Low" | "Adequate"
+risks: array of strings (can be empty [])
+recommendations: exactly 2-3 items
+notes: short friendly message, can be in Thai`;
+
+let history = JSON.parse(localStorage.getItem('healthLogs') || '[]');
+renderHistory();
+
+async function analyzeLog() {
+  const breakfast = document.getElementById('breakfast').value.trim();
+  const lunch = document.getElementById('lunch').value.trim();
+  const dinner = document.getElementById('dinner').value.trim();
+  const snack = document.getElementById('snack').value.trim();
+  const exercise = document.getElementById('exercise').value.trim();
+
+  if (!breakfast && !lunch && !dinner) {
+    showError('Please fill in at least one meal (Breakfast, Lunch, or Dinner) 🍽️');
+    return;
+  }
+
+  const btn = document.getElementById('analyzeBtn');
+  const loading = document.getElementById('loading');
+  const result = document.getElementById('result');
+  const errorBox = document.getElementById('errorBox');
+
+  btn.disabled = true;
+  loading.classList.add('active');
+  result.classList.remove('active');
+  errorBox.classList.remove('active');
+
+  const userMessage = [
+    breakfast && `Breakfast: ${breakfast}`,
+    lunch && `Lunch: ${lunch}`,
+    dinner && `Dinner: ${dinner}`,
+    snack && `Snack: ${snack}`,
+    exercise && `Exercise: ${exercise}`,
+    !exercise && `Exercise: None`
+  ].filter(Boolean).join('\n');
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: userMessage }]
+      })
+    });
+
+    if (!response.ok) throw new Error(`API error: ${response.status}`);
+
+    const data = await response.json();
+    const rawText = data.content.map(b => b.text || '').join('');
+    
+    let parsed;
+    try {
+      const clean = rawText.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(clean);
+    } catch {
+      throw new Error('Could not parse AI response. Please try again.');
+    }
+
+    renderResult(parsed, userMessage);
+
+    // Save to history
+    const entry = {
+      date: new Date().toISOString(),
+      log: userMessage,
+      result: parsed
+    };
+    history.unshift(entry);
+    if (history.length > 10) history = history.slice(0, 10);
+    localStorage.setItem('healthLogs', JSON.stringify(history));
+    renderHistory();
+
+  } catch (err) {
+    showError('Error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    loading.classList.remove('active');
+  }
+}
+
+function renderResult(d, log) {
+  // Date
+  document.getElementById('resultDate').textContent = new Date().toLocaleDateString('th-TH', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+
+  // Values
+  document.getElementById('calValue').textContent = d.calories || '—';
+  document.getElementById('sodiumValue').textContent = d.sodium || '—';
+  document.getElementById('scoreValue').textContent = d.score || '—';
+
+  // Eval
+  const evalCal = d.eval?.calories || '—';
+  const evalSodium = d.eval?.sodium || '—';
+  const evalProtein = d.eval?.protein || '—';
+
+  setEval('evalCal', evalCal, { 'Optimal': 'good', 'Low': 'warn', 'High': 'bad' });
+  setEval('evalSodium', evalSodium, { 'Safe': 'good', 'Borderline': 'warn', 'High': 'bad' });
+  setEval('evalProtein', evalProtein, { 'Adequate': 'good', 'Low': 'warn' });
+
+  // Risks
+  const risks = d.risks || [];
+  if (risks.length > 0) {
+    const risksList = document.getElementById('risksList');
+    risksList.innerHTML = risks.map(r => `<li class="risk-item">${r}</li>`).join('');
+    document.getElementById('risksBlock').style.display = 'block';
+  } else {
+    document.getElementById('risksBlock').style.display = 'none';
+  }
+
+  // Recommendations
+  const recs = d.recommendations || [];
+  document.getElementById('recList').innerHTML = recs.map(r => `<li>${r}</li>`).join('');
+
+  // Notes
+  if (d.notes) {
+    document.getElementById('notesText').textContent = d.notes;
+    document.getElementById('notesBlock').style.display = 'block';
+  } else {
+    document.getElementById('notesBlock').style.display = 'none';
+  }
+
+  document.getElementById('result').classList.add('active');
+  document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function setEval(id, value, map) {
+  const el = document.getElementById(id);
+  el.textContent = value;
+  el.className = 'eval-status';
+  const cls = map[value] || 'status-warn';
+  el.classList.add('status-' + cls);
+}
+
+function showError(msg) {
+  const box = document.getElementById('errorBox');
+  box.textContent = msg;
+  box.classList.add('active');
+  document.getElementById('loading').classList.remove('active');
+  document.getElementById('analyzeBtn').disabled = false;
+}
+
+function renderHistory() {
+  const container = document.getElementById('historyContainer');
+  if (history.length === 0) {
+    container.innerHTML = '<div class="history-empty">No logs yet. Start by analyzing your first day! 🌱</div>';
+    return;
+  }
+  container.innerHTML = history.slice(0, 5).map((entry, i) => {
+    const d = new Date(entry.date);
+    const dateStr = d.toLocaleDateString('th-TH', { weekday: 'short', month: 'short', day: 'numeric' });
+    const timeStr = d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+    return `
+      <div class="history-item">
+        <div class="history-score">${entry.result?.score || '?'}</div>
+        <div>
+          <div class="history-date">${dateStr} · ${timeStr}</div>
+          <div class="history-cal">🔥 ${entry.result?.calories || '?'} kcal · 🧂 ${entry.result?.sodium || '?'} mg</div>
+        </div>
+        <div class="history-chevron">›</div>
+      </div>
+    `;
+  }).join('');
+}
+</script>
+</body>
+</html>
